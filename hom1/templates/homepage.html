@@ -1,0 +1,476 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+  <style>
+  
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .form-container {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      max-width: 400px;
+      width: 100%;
+    }
+    
+    .form-container h3 {
+      margin-top: 0;
+    }
+    
+    .form-container input,
+    .form-container textarea {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      resize: none;
+    }
+    
+    .form-container button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 14px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .button.request{
+       background-color: #333;
+  color: #fff;
+  margin-right: 10px;
+    }
+    .button.feedback {
+  background-color: #333;
+  color: #fff;
+    }
+    .button.Home {
+  background-color: #333;
+  color: #fff;
+    }
+    
+
+
+    
+    
+    .form-container button[type="submit"] {
+      margin-right: 10px;
+    }
+
+    
+    .form-container button[type="cancel"] {
+      margin-right: 10px;
+    }
+    
+    .feedback-container {
+      margin-top: 20px;
+    }
+    
+    .feedback-container h3 {
+      margin-bottom: 10px;
+    }
+    
+    .feedback-container p {
+      margin: 0;
+    }
+
+    .button.Home {
+    float: right;
+
+    
+}
+.button.page-title-button {
+    background-color: #4caf4f00; /* Same as form-container button background color */
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 20px; /* Adjust the margin as needed */
+  }
+
+  #artisanContainer {
+    display: flex;
+    flex-wrap: wrap; /* Allow forms to wrap to a new row when needed */
+    justify-content: space-between; /* Distribute forms evenly along the row */
+    margin-top: 20px;
+  }
+
+/* Modify the .profile CSS rule to include a smooth transition effect */
+.profile {
+  display: inline-block;
+  width: (200px); /* Adjust the width and margin as needed for 3 columns */
+  margin: 0 10px 20px 0;
+  vertical-align: top;
+  box-sizing: border-box;
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  cursor: pointer;
+}
+
+
+/* Add a hover effect */
+.profile:hover {
+
+  transform: scale(1.05); /* Slightly scale up the form on hover */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add a subtle box shadow on hover */
+}
+.success-message {
+  color: green;
+  text-align: center;
+  display: none;
+  margin-top: 10px;
+}
+
+  </style>
+</head>
+
+  <header>
+    
+    <h1>ARTISANS AVAILABLE</h1>
+    <button class="button Home" onclick="logout()">Logout</button>
+    <!-- Add a button or link to trigger loading of artisan details -->
+    <button id="loadArtisansButton" class="button page-title-button">Load Artisans</button>
+  
+  </header>                                                                      
+  <main>
+    
+  <!-- Container for displaying artisan details -->
+<div id="artisanContainer"></div>
+
+    
+  </main>
+  
+  <body>
+
+  <script>
+
+    // Function to open the complaint form overlay
+    function openComplaintForm(artisanName) {
+      // Create an overlay
+      const overlay = document.createElement('div');
+      overlay.classList.add('overlay');
+      
+      // Create the form container
+      const formContainer = document.createElement('div');
+      formContainer.classList.add('form-container');
+      
+      
+      // Create the form title
+      const title = document.createElement('h3');
+      title.textContent = 'Complaint Form';
+
+       
+      // Create the user name input
+      const artisanInput = document.createElement('input');
+      artisanInput.type = 'text';
+      artisanInput.name = 'Username';
+      artisanInput.placeholder = 'UserName';
+      artisanInput.required = true;
+
+      // Create the user name number input
+      const artisannumber = document.createElement('input');
+      artisannumber.type = 'text';
+      artisannumber.name = 'Phone number';
+      artisannumber.placeholder = 'Phone number';
+      artisannumber.required = true;
+      
+      // Create the description textarea
+      const descriptionInput = document.createElement('textarea');
+      descriptionInput.name = 'description';
+      descriptionInput.placeholder = 'Enter your complaint description';
+      descriptionInput.required = true;
+      
+  // Create the submit button for complaint
+  const submitButton = document.createElement('button');
+  submitButton.type = 'submit';
+  submitButton.textContent = 'Submit';
+  submitButton.addEventListener('click', function() {
+    const username = artisanInput.value;
+    const phoneNumber = artisannumber.value;
+    const description = descriptionInput.value;
+
+    if (!username || !phoneNumber || !description) {
+      alert("All fields are required to be filled before submitting.");
+      return; // Don't proceed if any field is empty
+    }
+
+    const formData = new FormData();
+    formData.append('artisan_name', artisanName);
+    formData.append('username', username);
+    formData.append('phone_number', phoneNumber);
+    formData.append('description', description);
+
+    
+
+    fetch('/submit_request/', {
+      method: 'POST',
+      body: formData,
+    })
+    .then(response => {
+    if (response.ok) {
+      successMessage.style.display = 'block';
+    
+      // Show the success message and remove it after 3 seconds
+      successMessage.style.display = 'block';
+      setTimeout(() => {
+        successMessage.style.display = 'none';
+          artisanInput.value = '';
+      artisannumber.value = '';
+      descriptionInput.value = '';
+        document.body.removeChild(overlay);
+      }, 2300);
+    } else {
+      console.error('Request submission failed');
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
+});
+
+
+      // Create the cancel button
+      const cancelButton = document.createElement('button');
+      cancelButton.type = 'button';
+      cancelButton.textContent = 'Cancel';
+      cancelButton.classList.add('button');
+      
+// Create the success message element
+const successMessage = document.createElement('div');
+successMessage.classList.add('success-message');
+successMessage.textContent = 'Request was submitted successfully. An artisan will reach you very soon.';
+successMessage.style.display = 'none'; // Initially hide the success message
+
+    
+      
+      // Append elements to the form container
+      formContainer.appendChild(title);
+      formContainer.appendChild(artisanInput);
+      formContainer.appendChild(artisannumber);
+      formContainer.appendChild(descriptionInput);
+      formContainer.appendChild(submitButton);
+      formContainer.appendChild(cancelButton);
+      formContainer.appendChild(successMessage);
+     
+      
+      // Append the form container to the overlay
+      overlay.appendChild(formContainer);
+      
+      // Append the overlay to the body
+      document.body.appendChild(overlay);
+
+      //  Remove the form and overlay when the cancel button is clicked
+      cancelButton.addEventListener('click', function() {
+    document.body.removeChild(overlay);
+  });
+    }
+    
+   // Function to open the feedback form overlay
+function openFeedbackForm(artisanName) {
+  // Create an overlay
+  const overlay = document.createElement('div');
+  overlay.classList.add('overlay');
+
+  // Create the form container
+  const formContainer = document.createElement('div');
+  formContainer.classList.add('form-container');
+
+  // Create the form title
+  const title = document.createElement('h3');
+  title.textContent = 'Feedback';
+
+  // Create the feedback input
+const feedbackInput = document.createElement('textarea'); // Assuming you want a textarea for feedback
+feedbackInput.name = 'feedback';
+feedbackInput.placeholder = 'Your Feedback';
+feedbackInput.required = true;
+   
+
+   // Create the username input
+   const usernameInput = document.createElement('input');
+  usernameInput.type = 'text';
+  usernameInput.name = 'username';
+  usernameInput.placeholder = 'Your Name';
+  usernameInput.required = true;
+
+  
+  // Create the submit button for feedback
+  const submitButton = document.createElement('button');
+  submitButton.type = 'submit';
+  submitButton.textContent = 'Submit'; 
+  submitButton.addEventListener('click', function() {
+    const username = usernameInput.value;
+    const feedback = feedbackInput.value;
+
+    if (!username || !feedback) {
+      alert("Please enter your feedback.");
+      return; // Don't proceed if any field is empty
+    }
+
+    const formData = new FormData();
+    formData.append('artisan_name', artisanName);
+    formData.append('username', username);
+    formData.append('feedback', feedback);
+
+    fetch('/submit_feedback/', {
+      method: 'POST',
+      body: formData,
+    })
+    .then(response => {
+      if (response.ok) {
+        console.log('Thank you for your feedback');
+        // Show the success message and remove it after 3 seconds
+        successMessage.style.display = 'block';
+        setTimeout(() => {
+          successMessage.style.display = 'none';
+          document.body.removeChild(overlay);
+        }, 2300);
+      } else {
+        console.error('Feedback submission failed');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+  });
+ 
+
+  // Create the cancel button
+  const cancelButton = document.createElement('button');
+  cancelButton.type = 'button';
+  cancelButton.textContent = 'Cancel';
+  cancelButton.classList.add('button');
+
+     // Create a paragraph element for success message
+     const successMessage = document.createElement('p');
+successMessage.textContent = 'Feedback submitted successfully';
+successMessage.style.color = 'green';
+successMessage.style.textAlign = 'center';
+successMessage.style.display = 'none'; 
+
+
+  // Append elements to the form container
+  formContainer.appendChild(title);
+  formContainer.appendChild(usernameInput);
+  formContainer.appendChild(feedbackInput);
+  formContainer.appendChild(submitButton);
+  formContainer.appendChild(cancelButton);
+  formContainer.appendChild(successMessage);
+ 
+
+  // Append the form container to the overlay
+  overlay.appendChild(formContainer);
+
+  // Append the overlay to the body
+  document.body.appendChild(overlay);
+
+
+  // Remove the form and overlay when the cancel button is clicked
+  cancelButton.addEventListener('click', function() {
+    document.body.removeChild(overlay);
+  });
+
+   
+}
+
+
+function logout() {
+  // Redirect to the logout URL
+  window.location.href = "{% url 'logout' %}";
+}
+      
+
+  </script>
+
+</body>
+</html>
+
+
+
+
+<!-- JavaScript to load artisan details on button click -->
+<script>
+  document.getElementById('loadArtisansButton').addEventListener('click', function() {
+      fetch('{% url "get_artisans" %}')
+          .then(response => response.json())
+          .then(data => {
+              var artisanContainer = document.getElementById('artisanContainer');
+              artisanContainer.innerHTML = '';
+  
+              data.artisans.forEach(function(artisan) {
+                  var profileDiv = document.createElement('div');
+                   profileDiv.className = 'profile';
+  
+                  var heading = document.createElement('h2');
+                  heading.textContent = artisan.full_name;
+                  profileDiv.appendChild(heading);
+  
+                  var professionParagraph = document.createElement('p');
+                  professionParagraph.textContent = 'Profession: ' + artisan.profession;
+                  profileDiv.appendChild(professionParagraph);
+  
+                  var emailParagraph = document.createElement('p');
+                  emailParagraph.textContent = 'Email: ' + artisan.email;
+                  profileDiv.appendChild(emailParagraph);
+  
+                  var phoneParagraph = document.createElement('p');
+                  phoneParagraph.textContent = 'Phone: ' + artisan.phone_number;
+                  profileDiv.appendChild(phoneParagraph);
+  
+                  var addressParagraph = document.createElement('p');
+                  addressParagraph.textContent = 'Address: ' + artisan.address;
+                  profileDiv.appendChild(addressParagraph);
+  
+                  var requestButton = document.createElement('button');
+                  requestButton.className = 'button request';
+                  requestButton.textContent = 'Request';
+                  requestButton.addEventListener('click', function() {
+                      openComplaintForm(artisan.full_name);
+                  });
+                  profileDiv.appendChild(requestButton);
+  
+                  var feedbackButton = document.createElement('button');
+                  feedbackButton.className = 'button feedback';
+                  feedbackButton.textContent = 'Leave Feedback';
+                  feedbackButton.addEventListener('click', function() {
+                      openFeedbackForm(artisan.full_name);
+                  });
+                  profileDiv.appendChild(feedbackButton);
+  
+                  var feedbackContainerDiv = document.createElement('div');
+                  feedbackContainerDiv.className = 'feedback-container';
+                  profileDiv.appendChild(feedbackContainerDiv);
+  
+                  artisanContainer.appendChild(profileDiv);
+              });
+          })
+          .catch(error => console.error(error));
+  });
+</script>

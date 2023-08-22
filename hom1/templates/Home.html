@@ -1,0 +1,131 @@
+{% load static %}
+{% block content %}
+<html>
+<head>
+  <title>Artify - Artisan Website</title>
+  <!-- Add your CSS styles here -->
+  <link rel="stylesheet" href="{%static 'css/styles.css' %}">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      padding: 20px 0;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .hero-section {
+      text-align: center;
+      padding: 60px 0;
+      background-color: #f9f9f9;
+    }
+    .hero-section h1 {
+      font-size: 48px;
+      margin-bottom: 20px;
+      color: #333;
+    }
+    .hero-section p {
+      font-size: 18px;
+      color: #666;
+    }
+    .cta-button {
+      display: inline-block;
+      padding: 12px;
+      background-color: #333;
+      color: #fff;
+      border: none;
+      padding: 15px 30px;
+      text-decoration: none;
+      border-radius: 5px;
+      margin-top: 30px;
+    }
+    .featured-artisans {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      margin-top: 40px;
+    }
+    .artisan-card {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      max-width: 300px;
+      width: 100%;
+      margin-bottom: 20px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease; /* Add transition properties */
+      cursor: pointer; /* Change the cursor to a pointer */
+    }
+    
+    .artisan-card h3 {
+      font-size: 24px;
+      margin-bottom: 5px;
+    }
+    .artisan-card p {
+      font-size: 16px;
+      color: #666;
+      margin: 5px 0;
+    }
+    
+/* Add a hover effect */
+.artisan-card:hover {
+transform: scale(1.05); /* Slightly scale up the form on hover */
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add a subtle box shadow on hover */
+}
+    .artisan-card p.average-rating {
+      color: #333;
+      font-weight: bold;
+    }
+    .artisan-card p.region {
+      color: #333;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>ARTIFY</h1>
+  </header>
+  <div class="hero-section">
+    <h1>WELCOME TO ARTIFY</h1>
+    <p>Discover and connect with talented artisans</p>
+    <p>Ready to meet a master artisan or become one? Click the button below</p>
+    <a href="{% url 'login' %}" class="cta-button">Explore Artisans</a>
+  </div>
+  <div class="container">
+    <h2 id="featured-artisans">Featured Artisans</h2>
+    <div class="featured-artisans">
+      <!-- Artisan cards with average ratings and region -->
+      <div class="artisan-card">
+        <h3>John Ogunleye</h3>
+        <p>Carpenter</p>
+        <p class="average-rating">Average Rating: 4.2</p>
+        <p class="region">Region: Lekki, Lagos</p>
+      </div>
+      <div class="artisan-card">
+        <h3>Olaniyi Dapo</h3>
+        <p>Electrician</p>
+        <p class="average-rating">Average Rating: 4.7</p>
+        <p class="region">Region: Ikorodu, Lagos</p>
+      </div>
+      <div class="artisan-card">
+        <h3>Michael Chukwu</h3>
+        <p>Carpenter</p>
+        <p class="average-rating">Average Rating: 4.0</p>
+        <p class="region">Region: Pansheke, Abeokuta</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+
+{% endblock %}

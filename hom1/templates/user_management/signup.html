@@ -1,0 +1,135 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Sign Up</title>
+  <link rel="stylesheet" type="text/css" href="{% static 'css/styles_hs.css' %}">
+  <style>
+    /* Styles for error messages */
+    .error-message {
+      color: red;
+      font-size: 12px;
+      margin-top: 4px;
+    }
+  </style>
+  <script>
+   function validateSignUpForm() {
+  var fullName = document.forms["signupForm"]["fullName"].value;
+  var email = document.forms["signupForm"]["email"].value;
+  var password = document.forms["signupForm"]["password"].value;
+  var confirmPassword = document.forms["signupForm"]["confirmPassword"].value;
+  var User_Id = document.forms["signupForm"]["User_Id"].value;
+  var errorMessages = [];
+
+
+  if (fullName.trim() === "") {
+    errorMessages.push("Please enter your full name.");
+  }
+
+  if (email.trim() === "") {
+    errorMessages.push("Please enter your email.");
+  }
+
+  if (password === "") {
+    errorMessages.push("Please enter a password.");
+  } else if (password.length < 8) {
+    errorMessages.push("Password should be at least 8 characters long.");
+  }
+
+  if (confirmPassword === "") {
+    errorMessages.push("Please confirm your password.");
+  } else if (password !== confirmPassword) {
+    errorMessages.push("Passwords do not match.");
+  }
+
+  if (User_Id === "") {
+    errorMessages.push("Please enter a User_Id.");
+  } else if (/\w+/.test(User_Id) === false) {
+    errorMessages.push("Please enter a User_Id e.g user002");
+  }
+  // Display error messages or submit the form
+  if (errorMessages.length > 0) {
+    var errorContainer = document.getElementById("errorContainer");
+    errorContainer.innerHTML = errorMessages.join("<br>");
+    return false;
+  } else {
+    // Redirect to login page after successful sign up
+    window.location.href = "{% url 'login' %}";
+    return false; // Prevent form submission
+  }
+}
+
+
+  </script>
+  <div class="container">
+    <h1>SIGN UP</h1>
+    <form method="post" action="{% url 'signup' %}">
+      <div id="common-fields" style="display: none;">
+        {{ form.user_id.errors }}
+        {{ form.full_name.label_tag }} {{ form.full_name }}
+        {{ form.email.label_tag }} {{ form.email }}
+        {{ form.password.label_tag }} {{ form.password }}
+        {{ form.confirm_password.label_tag }} {{ form.confirm_password }}
+      </div>
+
+
+    
+      <div id="artisan-fields" style="display: none;">
+        {{ form.address.label_tag }} {{ form.address }}
+        {{ form.phone_number.label_tag }} {{ form.phone_number }}
+        {{ form.profession.label_tag }} {{ form.profession }}
+      </div>
+      
+  
+  
+      <!-- Select role with onchange event to handle role change -->
+      <select name="role" onchange="handleRoleChange(this)">
+        <option value="">Select Role</option>
+        <option value="user">User</option>
+        <option value="artisan">Artisan</option>
+      </select>
+      
+      <!-- Display CSRF token -->
+      {% csrf_token %}
+      
+      <!-- Submit button for the form -->
+      <button type="submit">Sign Up</button>
+    </form>
+    
+    <!-- Display errors for non-field errors -->
+    <div class="error-message">
+      {{ form.non_field_errors }}
+      {{ form.full_name.errors }}
+      {{ form.email.errors }}
+      {{ form.password.errors }}
+      {{ form.confirm_password.errors }}
+    </div>
+    
+    <!-- Display container for additional error messages -->
+    <div id="errorContainer" class="error-message"></div>
+    
+    <p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
+  </div>
+</html>
+<script>
+  
+  function handleRoleChange(selectElement) {
+      console.log("handleRoleChange function called");
+      var selectedRole = selectElement.value;
+      var artisanFieldsDiv = document.getElementById("artisan-fields");
+      
+      // Get the common fields div
+      var commonFieldsDiv = document.getElementById("common-fields");
+
+      if (selectedRole === "user") {
+        artisanFieldsDiv.style.display = "none";
+        commonFieldsDiv.style.display = "block";
+      } else if (selectedRole === "artisan") {
+        artisanFieldsDiv.style.display = "block";
+        commonFieldsDiv.style.display = "block";
+      } else {
+        artisanFieldsDiv.style.display = "none";
+        commonFieldsDiv.style.display = "none";
+      }
+    }
+</script>

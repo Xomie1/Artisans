@@ -1,0 +1,78 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login</title>
+  <link rel="stylesheet" type="text/css" href="{% static 'css/styles_hs.css' %}">
+  <style>
+    /* Styles for error messages */
+    .error-message {
+      color: red;
+      font-size: 12px;
+      margin-top: 4px;
+    }
+  </style>
+<script>
+  function validateLoginForm() {
+    var email = document.forms["loginForm"]["email"].value;
+    var password = document.forms["loginForm"]["password"].value;
+    var role = document.forms["loginForm"]["role"].value;
+    var errorMessages = [];
+
+    if (email.trim() === "") {
+      errorMessages.push("Please enter your email.");
+    }
+
+    if (password === "") {
+      errorMessages.push("Please enter your password.");
+    }
+
+    if (role === "") {
+      errorMessages.push("Please select your role.");
+    }
+
+    // Display error messages or submit the form
+    if (errorMessages.length > 0) {
+      var errorContainer = document.getElementById("errorContainer");
+      errorContainer.innerHTML = errorMessages.join("<br>");
+      return false; // Prevent the form submission
+    } else {
+      // Redirect based on role
+      if (role === "user") {
+        window.location.href = "{% url 'user' %}"; // Replace with your artisan homepage URL
+      } else if (role === "artisan") {
+        window.location.href = "{% url 'artisan' %}"; // Replace with your artisan homepage URL
+      }
+      // Allow the form submission
+      return true;
+    }
+  }
+  
+</script>
+
+</head>
+<body>
+  <div class="container">
+    <h1>LOGIN</h1>
+    <form name="loginForm" onsubmit="return validateLoginForm()" action="{% url 'login' %}" method="post">
+      {% csrf_token %}
+      <input type="email" name="email" placeholder="Email">
+      <div class="error-message">{{ errors.email|join:", " }}</div>
+      <input type="password" name="password" placeholder="Password">
+     
+
+      
+      <div class="error-message">{{ errors.password|join:", " }}</div>
+      <select name="role">
+        <option value="">Select Role</option>
+        <option value="user">User</option>
+        <option value="artisan">Artisan</option>
+      </select>
+      <div class="error-message">{{ errors.role|join:", " }}</div>
+      <button type="submit">Login</button>
+    </form>
+    <div id="errorContainer" class="error-message"></div>
+    <p>Don't have an account?  <a href="{% url 'signup' %}" class="cta-button">Signup</a>
+  </div>
+</body>
+</html>

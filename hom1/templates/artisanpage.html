@@ -1,0 +1,93 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+  <header>
+    <h1>
+      {% if artisan_full_name %}
+        <p>Welcome, {{ artisan_full_name }}</p>
+      {% endif %}
+    </h1>
+    <button class="button Home" onclick="logout()">Logout</button>
+    <button id="viewDashboardButton" class="button page-title-button">View Dashboard</button>
+  </header>
+   
+
+
+ 
+
+  <script>
+    var artisanContainer = document.createElement('div');
+    artisanContainer.className = 'profile';
+  
+    function updateDashboard() {
+  artisanContainer.innerHTML = ''; // Clear previous content
+
+  // Fetch the requests and feedback for the logged in artisan
+  fetch('{% url "get_requests_and_feedback" %}')
+    .then(response => response.json())
+    .then(data => {
+      if (data.requests_and_feedback.length === 0) {
+        var noDataMessage = document.createElement('p');
+        noDataMessage.textContent = 'No requests or feedback available.';
+        artisanContainer.appendChild(noDataMessage);
+      } else {
+        data.requests_and_feedback.forEach(function(request_and_feedback) {
+          var profileDiv = document.createElement('div');
+          profileDiv.className = 'profile';
+
+          var heading = document.createElement('h2');
+          heading.textContent = request_and_feedback.username;
+          profileDiv.appendChild(heading);
+
+          var phoneParagraph = document.createElement('p');
+          phoneParagraph.textContent = 'Phone: ' + request_and_feedback.phone_number;
+          profileDiv.appendChild(phoneParagraph);
+
+          if (request_and_feedback.request) {
+            var requestParagraph = document.createElement('p');
+            requestParagraph.textContent = 'Request: ' + request_and_feedback.request;
+            profileDiv.appendChild(requestParagraph);
+          }
+
+          if (request_and_feedback.feedback) {
+            var feedbackParagraph = document.createElement('p');
+            feedbackParagraph.textContent = 'Feedback: ' + request_and_feedback.feedback;
+            profileDiv.appendChild(feedbackParagraph);
+          }
+
+          artisanContainer.appendChild(profileDiv);
+        });
+      }
+
+      // Clear previous content and append the updated content
+      var userFormContainer = document.getElementById('UserFormContainer');
+      userFormContainer.innerHTML = '';
+      userFormContainer.appendChild(artisanContainer);
+    })
+    .catch(error => console.error(error));
+}
+    // Check if the artisan is logged in before updating the dashboard
+    if ('{{ artisan_full_name }}' !== '') {
+      updateDashboard();
+    }
+  
+    document.getElementById('viewDashboardButton').addEventListener('click', updateDashboard);
+  
+    function logout() {
+      // Redirect to the logout URL
+      window.location.href = "{% url 'logout' %}";
+    }
+  </script>
+  
+  <main>
+    <div id="UserFormContainer">
+    
+    </div>
+  </main>
+</body>
+</html>
+
