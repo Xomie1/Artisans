@@ -55,7 +55,7 @@ def login(request):
             # User does not exist
             errors['email'] = ["User does not exist"]
 
-    return render(request, 'login.html', {'errors': errors})
+    return render(request, 'user_management/login.html', {'errors': errors})
 
 
 
@@ -89,7 +89,7 @@ def signup(request):
     else:
         form = SignUpForm()
 
-    return render(request, 'signup.html', {'form': form})
+    return render(request, 'user_management/signup.html', {'form': form})
 
 def submit_request(request):
     if request.method == 'POST':
