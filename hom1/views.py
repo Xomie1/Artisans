@@ -20,10 +20,10 @@ def artisan_homepage_view(request):
 
 
 def user_homepage_view(request):
-    return render(request, "Homepage.html")
+    return render(request, "homepage.html")
 
 def home_view(request):
-    return render(request, "Home.html")
+    return render(request, "home.html")
 
 
 
