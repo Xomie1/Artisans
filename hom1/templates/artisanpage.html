@@ -6,88 +6,93 @@
 </head>
 <body>
   <header>
-    <h1>
-      {% if artisan_full_name %}
-        <p>Welcome, {{ artisan_full_name }}</p>
-      {% endif %}
-    </h1>
     <button class="button Home" onclick="logout()">Logout</button>
-    <button id="viewDashboardButton" class="button page-title-button">View Dashboard</button>
   </header>
-   
+  
+  <main>
+    <form id="artisan-info-form">
+      <label for="artisan-full-name">Your Full Name:</label>
+      <input type="text" id="artisan-full-name" name="artisan_full_name" required>
+      
+      <label for="artisan-email">Your Email:</label>
+      <input type="email" id="artisan-email" name="artisan_email" required>
+      
+      <button type="button" class="button" onclick="viewDashboard()">View Dashboard</button>
+    </form>
 
+    <div class="form-container" id="user-info">
+      <!-- User info will be populated here -->
+    </div>
 
- 
+    <div class="form-container" id="requests">
+      <!-- Requests/Feedback will be populated here -->
+    </div>
+  </main>
 
   <script>
-    var artisanContainer = document.createElement('div');
-    artisanContainer.className = 'profile';
-  
-    function updateDashboard() {
-  artisanContainer.innerHTML = ''; // Clear previous content
+    function viewDashboard() {
+      // Fetch the artisan's information and requests from the server
+      fetch('{% url "get_artisans" %}')
+        .then(response => response.json())
+        .then(data => {
+          // Check if there are any artisans in the response
+          if (data.artisans.length > 0) {
+            // Select the first artisan as an example (you can adjust this based on your requirements)
+            var artisan = data.artisans[0];
 
-  // Fetch the requests and feedback for the logged in artisan
-  fetch('{% url "get_requests_and_feedback" %}')
-    .then(response => response.json())
-    .then(data => {
-      if (data.requests_and_feedback.length === 0) {
-        var noDataMessage = document.createElement('p');
-        noDataMessage.textContent = 'No requests or feedback available.';
-        artisanContainer.appendChild(noDataMessage);
-      } else {
-        data.requests_and_feedback.forEach(function(request_and_feedback) {
-          var profileDiv = document.createElement('div');
-          profileDiv.className = 'profile';
+            // Populate the user info
+            var userInfoDiv = document.getElementById('user-info');
+            if (userInfoDiv) {
+              userInfoDiv.innerHTML = `
+                <h2>Your Info</h2>
+                <p>Username: ${artisan.full_name}</p>
+                <p>Phone Number: ${artisan.phone_number}</p>
+                <p>Email: ${artisan.email}</p>
+              `;
+            } else {
+              console.error("userInfoDiv not found.");
+            }
 
-          var heading = document.createElement('h2');
-          heading.textContent = request_and_feedback.username;
-          profileDiv.appendChild(heading);
+            // Populate the requests/feedback (this part is based on your original code)
+            var requestsDiv = document.getElementById('requests');
+            if (requestsDiv) {
+              requestsDiv.innerHTML = '<h2>Your Requests/Feedback</h2><p>Loading...</p>';
 
-          var phoneParagraph = document.createElement('p');
-          phoneParagraph.textContent = 'Phone: ' + request_and_feedback.phone_number;
-          profileDiv.appendChild(phoneParagraph);
-
-          if (request_and_feedback.request) {
-            var requestParagraph = document.createElement('p');
-            requestParagraph.textContent = 'Request: ' + request_and_feedback.request;
-            profileDiv.appendChild(requestParagraph);
+              // Fetch requests and feedback for the selected artisan
+              fetch(`{% url "get_requests_and_feedback" %}?full_name=${artisan.full_name}&email=${artisan.email}`)
+                .then(response => response.json())
+                .then(data => {
+                  var requestsDiv = document.getElementById('requests');
+                  if (requestsDiv) {
+                    if (data.requests_and_feedback.length > 0) {
+                      var requestsHTML = '<h2>Your Requests/Feedback</h2><ul>';
+                      data.requests_and_feedback.forEach(item => {
+                        if (item.description) {
+                          requestsHTML += `<li><p>Description: ${item.description}</p><p>Status: ${item.status}</p></li>`;
+                        } else if (item.feedback) {
+                          requestsHTML += `<li><p>Feedback: ${item.feedback}</p><p>Username: ${item.username}</p></li>`;
+                        }
+                      });
+                      requestsHTML += '</ul>';
+                      requestsDiv.innerHTML = requestsHTML;
+                    } else {
+                      requestsDiv.innerHTML = '<h2>Your Requests/Feedback</h2><p>No requests or feedback available.</p>';
+                    }
+                  } else {
+                    console.error("requestsDiv not found.");
+                  }
+                })
+                .catch(error => console.error(error));
+            }
           }
-
-          if (request_and_feedback.feedback) {
-            var feedbackParagraph = document.createElement('p');
-            feedbackParagraph.textContent = 'Feedback: ' + request_and_feedback.feedback;
-            profileDiv.appendChild(feedbackParagraph);
-          }
-
-          artisanContainer.appendChild(profileDiv);
-        });
-      }
-
-      // Clear previous content and append the updated content
-      var userFormContainer = document.getElementById('UserFormContainer');
-      userFormContainer.innerHTML = '';
-      userFormContainer.appendChild(artisanContainer);
-    })
-    .catch(error => console.error(error));
-}
-    // Check if the artisan is logged in before updating the dashboard
-    if ('{{ artisan_full_name }}' !== '') {
-      updateDashboard();
+        })
+        .catch(error => console.error(error));
     }
-  
-    document.getElementById('viewDashboardButton').addEventListener('click', updateDashboard);
-  
+
     function logout() {
       // Redirect to the logout URL
       window.location.href = "{% url 'logout' %}";
     }
   </script>
-  
-  <main>
-    <div id="UserFormContainer">
-    
-    </div>
-  </main>
 </body>
 </html>
-

@@ -20,10 +20,10 @@ def artisan_homepage_view(request):
 
 
 def user_homepage_view(request):
-    return render(request, "homepage.html")
+    return render(request, "Homepage.html")
 
 def home_view(request):
-    return render(request, "Home.html")
+    return render(request, "home.html")
 
 
 
@@ -128,29 +128,32 @@ def get_artisans(request):
     artisans = SignUp.objects.filter(role='artisan').values('full_name', 'email', 'address', 'phone_number', 'profession')
     return JsonResponse({'artisans': list(artisans)})
 
-
 def get_requests_and_feedback(request):
+    full_name = request.GET.get('full_name')
+    email = request.GET.get('email')
+
     requests_and_feedback = []
 
-    if request.user.is_authenticated:
-        requests = Request.objects.filter(artisan=request.user)
-        feedbacks = Feedback.objects.filter(artisan=request.user)
+    if full_name and email:
+        requests = Request.objects.filter(artisan_name=full_name)
+        feedbacks = Feedback.objects.filter(artisan_name=full_name)  # Select feedback based on artisan_name
 
         for req in requests:
             requests_and_feedback.append({
+                'description': req.description,
                 'username': req.username,
                 'phone_number': req.phone_number,
-                'request': req.description,
             })
 
         for fb in feedbacks:
             requests_and_feedback.append({
-                'username': fb.username,
-                'phone_number': fb.phone_number,
                 'feedback': fb.feedback,
+                'username': fb.username,
             })
 
     return JsonResponse({'requests_and_feedback': requests_and_feedback})
+
+
 
 
 
